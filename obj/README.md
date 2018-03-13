@@ -1,1 +1,1 @@
-# Fichiers objets du jeu
+# Fichiers objets du projet

@@ -1,2 +1,2 @@
-# Sauvegarde du jeu
+# Sauvegarde du projet
 Fichier save.txt
