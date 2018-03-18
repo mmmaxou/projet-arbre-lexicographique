@@ -12,13 +12,14 @@ int parseCommand(int argc, char *argv[]);
 void executeCommand(int command, Arbre a);
 int promptUser();
 Arbre readFile();
-Arbre allocArbre(char c);
+Arbre allocTree(char c);
+void getStrippedFilename(char s[]);
 int addWord(Arbre *a, char s[]);
 
 /* FONCTIONS D'EXECUTIONS */
 void displayTree( Arbre a );
 void saveWords_rec (Arbre a, FILE file);
-void saveWords(Arbre a, char *filepath);
+void saveWords(Arbre a);
 void research( Arbre a );
-void saveTree(Arbre a, FILE file, char *filepath);
+void saveTree(Arbre a);
 #endif

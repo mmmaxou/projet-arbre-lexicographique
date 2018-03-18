@@ -17,12 +17,20 @@ static char *filename;
 int main(int argc, char *argv[]) {
   Arbre tree;
   int command;
-  int userInput = 0;
+  int userInput = 1;
 
   /* On vérifie que l'argument donné en ligne de commande est correct et on ouvre le fichier */
   command = parseCommand(argc, argv);
   if ( command > 0 ) {
     tree = readFile();
+
+    /* TEST */
+    displayTree( tree );
+    printf("\n");
+    saveWords( tree );
+    saveTree( tree );
+    /* FIN TEST */
+
   } else {
     printf("Command given failed\n");
     exit(0);
@@ -30,11 +38,12 @@ int main(int argc, char *argv[]) {
   executeCommand( command, tree );
 
   /* On affiche le menu des commandes */
+  /*
   while ( userInput != 0 ) {
     userInput = promptUser();
-    executeCommand( command, tree );
+    executeCommand( userInput, tree );
   }
-
+  */
   return 0;
 }
 
@@ -65,7 +74,7 @@ int parseCommand(int argc, char *argv[]) {
     */
 
     if( *s != '-' ) {
-      printf("Please enter a valid option\n  > 'Lexique.exe -<option> <filename>'\n Where <option> is one of l/s/r/S\n");
+      printf("Please enter a valid option\n  > 'Lexique.exe -<option> <filename>'\nWhere <option> is one of l/s/r/S\n");
       return 0;
     }
 
@@ -88,7 +97,7 @@ int parseCommand(int argc, char *argv[]) {
         return SAUVEGARDE_ARBRE;
         break;
       default: {
-        printf("Please enter a valid option\n  > 'Lexique.exe -<option> <filename>'\n Where <option> is one of l/s/r/S\n");
+        printf("Please enter a valid option\n  > 'Lexique.exe -<option> <filename>'\nWhere <option> is one of l/s/r/S\n");
         return 0;
       }
         break;
@@ -96,11 +105,9 @@ int parseCommand(int argc, char *argv[]) {
 
 
   } else {
-    printf("Please enter a valid command for the program\n  > 'Lexique.exe -<option> <filename>'\n");
+    printf("Please enter a valid command\n  > 'Lexique.exe -<option> <filename>'\nWhere <option> is one of l/s/r/S\n");
     return 0;
   }
-
-
 
   return -1;
 }
@@ -118,6 +125,7 @@ int parseCommand(int argc, char *argv[]) {
 */
 void executeCommand( int command, Arbre a ) {
 
+  /* TODO */
   switch( command ) {
     case AFFICHAGE:
       /* Fonction de LECTURE */
@@ -135,7 +143,6 @@ void executeCommand( int command, Arbre a ) {
       /* Erreur */
       break;
   }
-
 }
 
 /*
@@ -151,21 +158,55 @@ void executeCommand( int command, Arbre a ) {
     4: SAUVEGARDE_ARBRE
 */
 int promptUser() {
+  int u;
 
-  return 0;
+  printf("Please select an option between thoses :\n");
+  printf(" > 0: EXIT\n");
+  printf(" > %d: AFFICHAGE\n", AFFICHAGE);
+  printf(" > %d: RECHERCHE\n", RECHERCHE);
+  printf(" > %d: SAUVEGARDE_MOTS\n", SAUVEGARDE_MOTS);
+  printf(" > %d: SAUVEGARDE_ARBRE\n", SAUVEGARDE_ARBRE);
+  scanf("%d", &u);
+  if ( u < 0 || u > SAUVEGARDE_ARBRE ) {
+    printf("Invalid input given.\n");
+    return promptUser();
+  }
+  return u;
 }
 
 /*
   Fonction Utils
-  Renvoi le filename sans l'extension
+  Copie le filename sans l'extension dans la variable <s>
 
-  @return <char *>
+  @param <char s[]>: La chaine de caractere dans laquelle le filename sera copiée
 */
-char* strippedFilename() {
-  /* TODO */
-
-  return "";
+void getStrippedFilename( char s[] ) {
+  if ( strcmp(filename, "") == 0 ) {
+    printf("Error : Unknow filename\n");
+    return;
+  }
+  char *lastdot;
+  strcpy(s, filename);
+  lastdot = strrchr( s, '.' );
+  if ( lastdot != NULL ) {
+    *lastdot = '\0';
+  } else {
+    printf("Error finding the . in the file extension\n");
+  }
 }
+
+/*
+  Fonction Utils
+  Copie le filename avec une nouvelle extension donnée dans la variable s
+
+  @param <char s[]>: La chaine de caractere dans laquelle le filename sera copiée
+  @param <char ext[]>: Une chaine de caractere qui contient l'extension à ajouter à notre chaine <s>
+*/
+void getFilenameExtension( char s[], char ext[] ) {
+  getStrippedFilename(s);
+  strcat(s, ext);
+}
+
 
 /* 
   Function
@@ -174,7 +215,7 @@ char* strippedFilename() {
   @param <char c>:
     La lettre à créer
 */
-Arbre allocArbre(char c) {
+Arbre allocTree(char c) {
   Arbre a = (Arbre) malloc(sizeof(*a));
   if ( a ) {
     if ( c >= 'A' && c <= 'Z' ) {
@@ -212,7 +253,7 @@ int addWord(Arbre *a, char s[]) {
 
   /* Création de l'arbre */
   c = *s;
-  tmp = allocArbre(c);
+  tmp = allocTree(c);
 
   /* Ajout de l'arbre crée dans l'arbre donné en arg */
   if ( *a == NULL ) {
@@ -224,7 +265,7 @@ int addWord(Arbre *a, char s[]) {
       return addWord(&((*a)->filsg), s+1 );
     }
   } else {
-    
+
     /* On cherche parmis les freres */
     if ( tmp->lettre > (*a)->lettre ) {
       /* La lettre a ajouter est plus grande que le lettre de l'arbre */
@@ -238,8 +279,8 @@ int addWord(Arbre *a, char s[]) {
       /* C'est la meme lettre */
       return addWord(&((*a)->filsg), s+1 );
     }
-    
-    
+
+
   }
 
   return -1;
@@ -260,14 +301,13 @@ Arbre readFile() {
   char word[TAILLE] = "";
 
   if ( file ) {
-    printf("Création de l'arbre ... \n");
+    printf(" > Création de l'arbre ...\n");
 
     while (fscanf(file, "%s", word) == 1) {
       addWord(&a, word);
     }
 
-    displayTree(a);
-    printf("\nArbre crée \n");
+    printf(" > Arbre crée \n");
     fclose(file);  
   } else {
     printf("Erreur lecture du fichier\n");
@@ -288,11 +328,16 @@ Arbre readFile() {
 */
 void displayTree( Arbre a ) {
   /* TODO */
+
+
+  /* Le bout de code est pas terrible, il me servait juste a tester */
+  /*
   if ( a ) {
     printf("%c", a->lettre );
     displayTree( a->filsg );
     displayTree( a->frered );
   } 
+  */
 }
 
 /*
@@ -303,7 +348,7 @@ void displayTree( Arbre a ) {
   @param <FILE file>
 */
 void saveWords_rec (Arbre a, FILE file) {
-
+  /* TODO */
 }
 
 /*
@@ -312,8 +357,11 @@ void saveWords_rec (Arbre a, FILE file) {
 
   @param <Arbre a>
 */
-void saveWords(Arbre a, char *filepath) {
+void saveWords( Arbre a ) {
   FILE file;
+  char fileWords[255];
+  getFilenameExtension( fileWords, ".L");
+  printf("%s\n", fileWords);
   /* Creation du fichier */
   /* TODO */
 
@@ -341,7 +389,10 @@ void research( Arbre a ) {
 
   @param <Arbre a>
 */
-void saveTree(Arbre a, FILE file, char *filepath) {
-  /* TODO */
+void saveTree( Arbre a ) {
+  FILE file;
+  char fileTree[255];
+  getFilenameExtension( fileTree, ".DICO");
+  printf("%s\n", fileTree);
 }
 
