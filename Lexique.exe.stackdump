@@ -1,0 +1,9 @@
+Exception: STATUS_ACCESS_VIOLATION at eip=00401315
+eax=80058588 ebx=0028CC20 ecx=80058590 edx=611FB0B0 esi=00000069 edi=00000004
+ebp=0028CC78 esp=0028CBE0 program=D:\Max\Softwares\wamp\www\projet-arbre-lexicographique\Lexique.exe, pid 7164, thread main
+cs=0023 ds=002B es=002B fs=0053 gs=002B ss=002B
+Stack trace:
+Frame     Function  Args
+0028CC78  00401315 (00000003, 0028CC9C, 800000D0, 612AE154)
+0028CD28  61007A27 (00000000, 0028CD84, 61006A20, 00000000)
+End of stack trace

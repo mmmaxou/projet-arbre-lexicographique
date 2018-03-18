@@ -12,6 +12,8 @@ int parseCommand(int argc, char *argv[]);
 void executeCommand(int command, Arbre a);
 int promptUser();
 Arbre readFile();
+Arbre allocArbre(char c);
+int addWord(Arbre *a, char s[]);
 
 /* FONCTIONS D'EXECUTIONS */
 void displayTree( Arbre a );
