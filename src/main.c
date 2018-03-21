@@ -19,6 +19,8 @@ int main(int argc, char *argv[]) {
   int command;
   int userInput = 1;
 
+  printf("Coucou max,ça va ? \n");
+
   /* On vérifie que l'argument donné en ligne de commande est correct et on ouvre le fichier */
   command = parseCommand(argc, argv);
   if ( command > 0 ) {
