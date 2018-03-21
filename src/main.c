@@ -19,8 +19,6 @@ int main(int argc, char *argv[]) {
   int command;
   int userInput = 1;
 
-  printf("Coucou max,ça va ? \n");
-
   /* On vérifie que l'argument donné en ligne de commande est correct et on ouvre le fichier */
   command = parseCommand(argc, argv);
   if ( command > 0 ) {
@@ -46,6 +44,17 @@ int main(int argc, char *argv[]) {
     executeCommand( userInput, tree );
   }
   */
+
+  /*
+  Utilisation de la fonction recherche
+
+  if (research(tree, mot) == 1) printf("present");
+  if (research(tree, mot) == 0) printf("absent");
+
+  Je ne sais pas encore si il faudra écrire plus que ça, 
+  pour l'instant je pose ça là
+  */
+
   return 0;
 }
 
@@ -328,18 +337,30 @@ Arbre readFile() {
 
   @param <Arbre a>
 */
-void displayTree( Arbre a ) {
-  /* TODO */
+void displayTree( Arbre a, int* buffer, int i ) {
+  if ( a == NULL ) return;
 
+  buffer[i]=a->lettre;
 
-  /* Le bout de code est pas terrible, il me servait juste a tester */
   /*
-  if ( a ) {
-    printf("%c", a->lettre );
-    displayTree( a->filsg );
-    displayTree( a->frered );
-  } 
+  Si on n'a pas encore atteint la fin d'un mot :
+  On descend dans l'arbre, et on "incrémente" i pour avancer dans la liste
   */
+  if ( a->lettre != '\0' ) {
+    displayTree( a->filsg, buffer, i+1 );
+  }
+  else {
+    printf("%s\n", buffer);
+  }
+    
+  /*
+  Si on est sur un caractère \0 et que celui-ci a un frere :
+  on passe sur ce frère sans incrémenter pour remplacer le \0 dans la liste
+  */
+  displayTree( a->frered, buffer, i );  
+
+  return;
+  
 }
 
 /*
@@ -381,8 +402,14 @@ void saveWords( Arbre a ) {
 
   @param <Arbre a>
 */
-void research( Arbre a ) {
+void research( Arbre a, char* mot ) {
   /* TODO */
+  if ( a == NULL || *mot < a->lettre ) return 0;
+  if (*mot == a->lettre) {
+    if (*mot == '\0') return 1;
+    return rechercher(a->filsg, mot+1);
+  }
+  return rechercher(a->frered, mot);
 }
 
 /*
