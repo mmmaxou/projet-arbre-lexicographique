@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     tree = readFile();
 
     /* TEST */
-    displayTree( tree );
+    displayTree( tree, NULL, 0);
     printf("\n");
     saveWords( tree );
     saveTree( tree );
@@ -140,6 +140,7 @@ void executeCommand( int command, Arbre a ) {
   switch( command ) {
     case AFFICHAGE:
       /* Fonction de LECTURE */
+      displayTree(a, NULL, 0);
       break;
     case RECHERCHE:
       /* Fonction de RECHERCHE */
@@ -350,9 +351,10 @@ void displayTree( Arbre a, int* buffer, int i ) {
     displayTree( a->filsg, buffer, i+1 );
   }
   else {
-    printf("%s\n", buffer);
+    /*TODO affiche liste caractere*/
+    printf("%d\n", *buffer);
   }
-    
+
   /*
   Si on est sur un caractère \0 et que celui-ci a un frere :
   on passe sur ce frère sans incrémenter pour remplacer le \0 dans la liste
@@ -407,9 +409,9 @@ void research( Arbre a, char* mot ) {
   if ( a == NULL || *mot < a->lettre ) return 0;
   if (*mot == a->lettre) {
     if (*mot == '\0') return 1;
-    return rechercher(a->filsg, mot+1);
+    return research(a->filsg, mot+1);
   }
-  return rechercher(a->frered, mot);
+  return research(a->frered, mot);
 }
 
 /*
