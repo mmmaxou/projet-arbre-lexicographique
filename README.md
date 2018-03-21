@@ -7,6 +7,28 @@ https://elearning.u-pem.fr/pluginfile.php/183409/mod_resource/content/1/Fgfrd.pd
 
 > __C'est trivial en vrai__
 
+> Pour lancer le programme :
+
+```
+	Lexique.exe -<option> <filename>
+```
+
+> Par exemple : 
+
+```
+	Lexique.exe -l data/book.txt
+```
+Set à afficher le livre
+
+Liste des options :
+ * `-l <filename>` : Lecture du livre
+ * `-r <mot> <filename>` : Recherche du mot dans le livre
+ * `-s <filename>` : Sauvegarde du livre
+ * `-S <filename>` : Sauvegarde de l'arbre
+ * `-h` : Affiche l'aide
+ 
+ 
+ 
 # TODO
 
 * Afficher les mots du lexique en ordre lexicographique

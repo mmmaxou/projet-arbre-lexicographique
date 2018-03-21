@@ -8,10 +8,22 @@
 #define RECHERCHE 2
 #define SAUVEGARDE_MOTS 3
 #define SAUVEGARDE_ARBRE 4
+#define HELP 5
 #define TAILLE 50
+
+/* Couleurs */
+#define RED   "\x1B[31m"
+#define GREEN   "\x1B[32m"
+#define YELLOW   "\x1B[33m"
+#define BLUE   "\x1B[34m"
+#define MAGENTA   "\x1B[35m"
+#define CYAN   "\x1B[36m"
+#define WHITE   "\x1B[37m"
+#define RESET "\x1B[0m"
 
 /* VARIABLE Globale qui contient le nom du fichier donné en ligne de commande */
 static char *filename;
+static char *researchedWord;
 
 
 int main(int argc, char *argv[]) {
@@ -23,36 +35,44 @@ int main(int argc, char *argv[]) {
   command = parseCommand(argc, argv);
   if ( command > 0 ) {
     tree = readFile();
-
-    /* TEST */
-    displayTree( tree, NULL, 0);
-    printf("\n");
-    saveWords( tree );
-    saveTree( tree );
-    /* FIN TEST */
-
   } else {
     printf("Command given failed\n");
     exit(0);
-  }
-  executeCommand( command, tree );
-
+  }	
+	executeCommand( command, tree );
+	
+	
+	
   /* On affiche le menu des commandes */
-  /*
+  
   while ( userInput != 0 ) {
     userInput = promptUser();
     executeCommand( userInput, tree );
   }
-  */
+  
+
+	
+	/*
+		Test de la fonction display
+	*/
+	/*
+	printf("Test display : \n");
+	displayTree( tree, NULL, 0); 
+	*/
 
   /*
-  Utilisation de la fonction recherche
-
-  if (research(tree, mot) == 1) printf("present");
-  if (research(tree, mot) == 0) printf("absent");
-
-  Je ne sais pas encore si il faudra écrire plus que ça, 
-  pour l'instant je pose ça là
+  	Test de la fonction recherche
+	*/
+	/*
+	printf("Test recherche : \n");
+	printf("chat ? %d\n", research(tree, "chat"));
+	printf("aime ? %d\n", research(tree, "aime"));
+	printf("Sylvie ? %d\n", research(tree, "Sylvie"));
+	printf("sylvie ? %d\n", research(tree, "sylvie"));
+	*/
+	/*
+		Je ne sais pas encore si il faudra écrire plus que ça, 
+		pour l'instant je pose ça là
   */
 
   return 0;
@@ -72,43 +92,45 @@ int main(int argc, char *argv[]) {
     2: RECHERCHE
     3: SAUVEGARDE_MOTS
     4: SAUVEGARDE_ARBRE
+		5: HELP
 */
 int parseCommand(int argc, char *argv[]) {
   /* Inspection des arguments */
-  if ( argc == 3 ) {
-    /* Commutateur -l / -s / -r  / -S */
-    char *s = argv[1];
-    /*
-    printf("Commande : %s\n", s);
-    printf("*s : %c\n", *s);
-    printf("option : %c\n", *(s+1));
-    */
+  if ( argc == 3 || argc == 4 ) {
+    /* Commutateur -l / -s / -r  / -S / -h */
+    char *option = argv[1];
 
-    if( *s != '-' ) {
-      printf("Please enter a valid option\n  > 'Lexique.exe -<option> <filename>'\nWhere <option> is one of l/s/r/S\n");
+    if( *option != '-' ) {
+      printf("Please enter a valid option\n  > 'Lexique.exe -<option> <filename>'\nWhere <option> is one of l/s/r/S/h\n");
       return 0;
     }
 
     /* Stocke le nom du fichier donné en ligne de commande dans la variable globale <filename> */
-    /* argv[argc-1] => Dernier argument donné en ligne de commande = nom_du_fichier */
     filename = argv[argc-1];
-    /* printf("filename: %s\n", filename); */
+		
+		/* Si on recherche un mot, on sauvegarde le mot dans la variable statique */
+		if ( argc == 4 ) {
+			researchedWord = argv[2];
+		}
 
-    switch ( *(s+1) ) {
+    switch ( *(option+1) ) {
       case 'l':
         return AFFICHAGE;
         break;
-      case 's':
+      case 'r':
         return RECHERCHE;
         break;
-      case 'r':
+      case 's':
         return SAUVEGARDE_MOTS;
         break;
       case 'S':
         return SAUVEGARDE_ARBRE;
         break;
+      case 'h':
+        return HELP;
+        break;
       default: {
-        printf("Please enter a valid option\n  > 'Lexique.exe -<option> <filename>'\nWhere <option> is one of l/s/r/S\n");
+        printf("Please enter a valid option\n  > 'Lexique.exe -<option> <filename>'\nWhere <option> is one of l/s/r/S/h\n");
         return 0;
       }
         break;
@@ -116,7 +138,7 @@ int parseCommand(int argc, char *argv[]) {
 
 
   } else {
-    printf("Please enter a valid command\n  > 'Lexique.exe -<option> <filename>'\nWhere <option> is one of l/s/r/S\n");
+    printf("Please enter a valid command\n  > 'Lexique.exe -<option> <filename>'\nWhere <option> is one of l/s/r/S/h\n");
     return 0;
   }
 
@@ -132,17 +154,24 @@ int parseCommand(int argc, char *argv[]) {
     1: LECTURE
     2: RECHERCHE
     3: SAUVEGARDE_MOTS
-    4: SAUVEGARDE_ARBRE  
+    4: SAUVEGARDE_ARBRE
+		5: HELP
 */
 void executeCommand( int command, Arbre a ) {
-
-  /* TODO */
+	int res;
+	printf("execCommand: %d\n", command);
   switch( command ) {
     case AFFICHAGE:
       /* Fonction de LECTURE */
       displayTree(a, NULL, 0);
       break;
     case RECHERCHE:
+			res = research( a, researchedWord );
+			if ( res ) {
+				printf("Word found !(%s)\n", researchedWord);
+			} else {
+				printf("Word not found !(%s)\n", researchedWord);
+			}
       /* Fonction de RECHERCHE */
       break;
     case SAUVEGARDE_MOTS:
@@ -150,6 +179,10 @@ void executeCommand( int command, Arbre a ) {
       break;
     case SAUVEGARDE_ARBRE:
       /* Fonction de SAUVEGARDE_ARBRE */
+      break;
+    case HELP:
+      /* Fonction de HELP */
+			displayHelp();
       break;
     default:
       /* Erreur */
@@ -168,18 +201,34 @@ void executeCommand( int command, Arbre a ) {
     2: RECHERCHE
     3: SAUVEGARDE_MOTS
     4: SAUVEGARDE_ARBRE
+		5: HELP
 */
 int promptUser() {
-  int u;
+  int u, i;
+	char c;
 
-  printf("Please select an option between thoses :\n");
+  printf(CYAN "Please select an option between thoses :\n");
   printf(" > 0: EXIT\n");
   printf(" > %d: AFFICHAGE\n", AFFICHAGE);
   printf(" > %d: RECHERCHE\n", RECHERCHE);
   printf(" > %d: SAUVEGARDE_MOTS\n", SAUVEGARDE_MOTS);
   printf(" > %d: SAUVEGARDE_ARBRE\n", SAUVEGARDE_ARBRE);
+  printf(" > %d: HELP\n" RESET, HELP);
   scanf("%d", &u);
-  if ( u < 0 || u > SAUVEGARDE_ARBRE ) {
+	
+	if ( u == RECHERCHE ) {
+		printf(CYAN "Please enter a word you want to research :\n" RESET);
+		scanf("%s", researchedWord);
+		
+		/* Change le mot donné en minuscule */
+		i=0;
+		while ( *(researchedWord + i) != '\0' ) {
+			toLowerCase(researchedWord + i);
+			i++;
+		}
+	}
+	
+  if ( u < 0 || u > HELP ) {
     printf("Invalid input given.\n");
     return promptUser();
   }
@@ -219,6 +268,29 @@ void getFilenameExtension( char s[], char ext[] ) {
   strcat(s, ext);
 }
 
+/*
+	Function
+	
+	Affiche une aide sur l'utilisation du programme
+*/
+void displayHelp() {
+	printf(GREEN "\n----- AIDE -----\n" RESET);
+	printf("Pour lancer le programme :\n");
+	printf(MAGENTA "Lexique.exe -<option> <filename>\n" RESET);
+	printf("Par exemple :");
+	printf(MAGENTA "\nLexique.exe -l data/book.txt\n" RESET);
+	printf(GREEN "\n----- Options ----- \n" RESET);
+	printf(MAGENTA "-l <filename>" RESET);
+	printf(": Lecture du livre\n");
+	printf(MAGENTA "-r <mot> <filename>" RESET);
+	printf(": Recherche du mot dans le livre\n");
+	printf(MAGENTA "-s <filename>" RESET);
+	printf(": Sauvegarde du livre\n");
+	printf(MAGENTA "-S <filename>" RESET);
+	printf(": Sauvegarde de l'arbre\n");
+	printf(MAGENTA "-h" RESET);
+	printf(": Affiche l'aide\n\n");
+}
 
 /* 
   Function
@@ -230,9 +302,7 @@ void getFilenameExtension( char s[], char ext[] ) {
 Arbre allocTree(char c) {
   Arbre a = (Arbre) malloc(sizeof(*a));
   if ( a ) {
-    if ( c >= 'A' && c <= 'Z' ) {
-      c = c + ('a' - 'A');
-    }
+		toLowerCase(&c);
     a->lettre = c;
     a->filsg = NULL;
     a->frered = NULL;
@@ -242,6 +312,20 @@ Arbre allocTree(char c) {
     exit(0);
   }  
 }
+
+
+/*
+	Function Utils
+	Prend une lettre en parametre et la transforme en lowercase si besoin
+	
+	@param <char c>
+*/
+void toLowerCase( char *c ) {
+	if ( *c >= 'A' && *c <= 'Z' ) {
+		*c = *c + ('a' - 'A');
+	}
+}
+
 
 /*
   Function
@@ -398,14 +482,17 @@ void saveWords( Arbre a ) {
   /* TODO */
 }
 
+
 /*
   Fonction
   Indiquer si le mot est present dans le texte et affiche "present" ou "absent"
 
   @param <Arbre a>
+	@return <int>
+		0: Non trouvé
+		1: Trouvé
 */
-void research( Arbre a, char* mot ) {
-  /* TODO */
+int research( Arbre a, char* mot ) {
   if ( a == NULL || *mot < a->lettre ) return 0;
   if (*mot == a->lettre) {
     if (*mot == '\0') return 1;
