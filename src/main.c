@@ -55,10 +55,10 @@ int main(int argc, char *argv[]) {
 	/*
 		Test de la fonction display
 	*/
-	/*
+	
 	printf("Test display : \n");
 	displayTree( tree, NULL, 0); 
-	*/
+	
 
   /*
   	Test de la fonction recherche
@@ -70,11 +70,7 @@ int main(int argc, char *argv[]) {
 	printf("Sylvie ? %d\n", research(tree, "Sylvie"));
 	printf("sylvie ? %d\n", research(tree, "sylvie"));
 	*/
-	/*
-		Je ne sais pas encore si il faudra écrire plus que ça, 
-		pour l'instant je pose ça là
-  */
-
+	
   return 0;
 }
 
@@ -205,7 +201,7 @@ void executeCommand( int command, Arbre a ) {
 */
 int promptUser() {
   int u, i;
-	char c;
+	/*char c;*/
 
   printf(CYAN "Please select an option between thoses :\n");
   printf(" > 0: EXIT\n");
@@ -413,6 +409,14 @@ Arbre readFile() {
   return a;
 }
 
+void printCharTab(int* buffer) {
+  int i=0;
+  while (buffer[i] != '\0') {
+    printf("%c", buffer[i]);
+    i++;
+  }
+  printf("\n");
+}
 
 /* FONCTIONS D'EXECUTIONS */
 
@@ -435,8 +439,7 @@ void displayTree( Arbre a, int* buffer, int i ) {
     displayTree( a->filsg, buffer, i+1 );
   }
   else {
-    /*TODO affiche liste caractere*/
-    printf("%d\n", *buffer);
+    printCharTab(buffer);
   }
 
   /*
@@ -507,6 +510,7 @@ int research( Arbre a, char* mot ) {
 
   @param <Arbre a>
 */
+  
 void saveTree( Arbre a ) {
   FILE file;
   char fileTree[255];
