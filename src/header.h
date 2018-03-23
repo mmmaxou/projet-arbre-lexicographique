@@ -18,6 +18,8 @@ int addWord(Arbre *a, char s[]);
 void toLowerCase( char *c );
 
 /* FONCTIONS D'EXECUTIONS */
+
+void printCharTab(int* buffer);
 void displayTree( Arbre a, int* buffer, int i );
 void displayHelp();
 void saveWords_rec (Arbre a, FILE file);
