@@ -201,7 +201,7 @@ void executeCommand( int command, Arbre a ) {
 */
 int promptUser() {
   int u, i;
-	/*char c;*/
+	char c;
 
   printf(CYAN "Please select an option between thoses :\n");
   printf(" > 0: EXIT\n");
