@@ -201,7 +201,7 @@ void executeCommand( int command, Arbre a ) {
 */
 int promptUser() {
   int u, i;
-	char c;
+	/*char c;*/
 
   printf(CYAN "Please select an option between thoses :\n");
   printf(" > 0: EXIT\n");
@@ -510,7 +510,7 @@ int research( Arbre a, char* mot ) {
 
   @param <Arbre a>
 */
-  
+  /*
 void saveTree( Arbre a ) {
   FILE file;
   char fileTree[255];
@@ -518,3 +518,4 @@ void saveTree( Arbre a ) {
   printf("%s\n", fileTree);
 }
 
+*/
