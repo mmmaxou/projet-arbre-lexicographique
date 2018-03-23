@@ -3,8 +3,7 @@
 src_dir = src
 obj_dir = obj
 
-# _OBJECTS = main.o UListe.o Monde.o Unite.o Affichage.o Utils.o Sauvegarde.o AffichageMLV.o
-_OBJECTS = main.o
+_OBJECTS = main.o Liste.o
 OBJECTS = $(patsubst %,$(obj_dir)/%,$(_OBJECTS))
 
 CFLAGS = -c -ansi -g -O2 -Wall

@@ -29,8 +29,9 @@ static char *researchedWord;
 int main(int argc, char *argv[]) {
   Arbre tree;
   int command;
+  /*
   int userInput = 1;
-
+*/
   /* On vérifie que l'argument donné en ligne de commande est correct et on ouvre le fichier */
   command = parseCommand(argc, argv);
   if ( command > 0 ) {
@@ -44,20 +45,12 @@ int main(int argc, char *argv[]) {
 	
 	
   /* On affiche le menu des commandes */
-  
+  /*
   while ( userInput != 0 ) {
     userInput = promptUser();
     executeCommand( userInput, tree );
   }
-  
-
-	
-	/*
-		Test de la fonction display
-	*/
-	
-	printf("Test display : \n");
-	displayTree( tree, NULL, 0); 
+  */
 	
 
   /*
@@ -159,7 +152,7 @@ void executeCommand( int command, Arbre a ) {
   switch( command ) {
     case AFFICHAGE:
       /* Fonction de LECTURE */
-      displayTree(a, NULL, 0);
+      displayTree(a);
       break;
     case RECHERCHE:
 			res = research( a, researchedWord );
@@ -409,16 +402,30 @@ Arbre readFile() {
   return a;
 }
 
-void printCharTab(int* buffer) {
-  int i=0;
-  while (buffer[i] != '\0') {
-    printf("%c", buffer[i]);
-    i++;
-  }
-  printf("\n");
-}
 
 /* FONCTIONS D'EXECUTIONS */
+/*
+  Fonction Reccursive
+  Afficher les mots du lexique en ordre lexicographique
+
+  @param <Arbre a>
+  @param <int *buffer>
+  @param <int i>
+*/
+void displayTree_rec( Arbre a, UListe *path ) {
+   
+  if ( a ) {
+    ajouterFinUListe( path, a->lettre );
+    if( a->lettre == '\0' ) {
+      afficherUListe( path );
+    }
+    displayTree_rec( a->filsg, path );
+    supprimerDernierUListe( path );
+    displayTree_rec( a->frered, path );
+    
+  }
+}
+
 
 /*
   Fonction
@@ -426,30 +433,14 @@ void printCharTab(int* buffer) {
 
   @param <Arbre a>
 */
-void displayTree( Arbre a, int* buffer, int i ) {
+void displayTree( Arbre a ) {
   if ( a == NULL ) return;
-
-  buffer[i]=a->lettre;
-
-  /*
-  Si on n'a pas encore atteint la fin d'un mot :
-  On descend dans l'arbre, et on "incrémente" i pour avancer dans la liste
-  */
-  if ( a->lettre != '\0' ) {
-    displayTree( a->filsg, buffer, i+1 );
-  }
-  else {
-    printCharTab(buffer);
-  }
-
-  /*
-  Si on est sur un caractère \0 et que celui-ci a un frere :
-  on passe sur ce frère sans incrémenter pour remplacer le \0 dans la liste
-  */
-  displayTree( a->frered, buffer, i );  
-
-  return;
   
+  UListe path;
+  path.premier = NULL;
+  path.dernier = NULL;
+  path.taille = 0;
+  displayTree_rec(a, &path);
 }
 
 /*
