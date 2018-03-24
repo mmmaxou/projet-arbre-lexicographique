@@ -25,8 +25,12 @@ int parseCommand(int argc, char *argv[]);
 void executeCommand(int command, Arbre a);
 int promptUser();
 Arbre readFile();
+Arbre readDICO();
+void satanize(char *word);
+void satanizeFile();
 Arbre allocTree(char c);
 void getStrippedFilename(char s[]);
+void getFilenameExtension( char s[], char ext[] );
 int addWord(Arbre *a, char s[]);
 void toLowerCase( char *c );
 
