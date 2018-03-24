@@ -28,7 +28,7 @@ static char *researchedWord;
 
 
 int main(int argc, char *argv[]) {
-	Arbre tree;
+	Arbre tree = NULL;
 	int command;
 	/*
   int userInput = 1;
@@ -72,7 +72,9 @@ int main(int argc, char *argv[]) {
 		dot_export( tree, file );
 		fclose(file);
 	}
-	free_arbre( tree );
+	if ( tree != NULL ) {
+		free_arbre( tree );		
+	}
 
 	return 0;
 }
@@ -193,6 +195,7 @@ void executeCommand( int command, Arbre a ) {
 		case SATANIZE:
 			/* Fonction de HELP */
 			satanizeFile();
+			exit(0);
 			break;
 		default:
 			/* Erreur */
@@ -358,6 +361,11 @@ int addWord(Arbre *a, char s[]) {
 	/* Création de l'arbre */
 	c = *s;
 	tmp = allocTree(c);
+	
+	if ( !tmp ) {
+		printf("Erreur allocation arbre\n");
+		return -1;
+	}
 
 	/* Ajout de l'arbre crée dans l'arbre donné en arg */
 	if ( *a == NULL ) {
@@ -492,22 +500,35 @@ void satanizeFile() {
 
 	FILE *file_input;
 	FILE *file_clean;
+	
+	char clean[255];
+	getFilenameExtension( clean, "_clean.txt");
+	
 	file_input = fopen(filename, "r");
-	file_clean = fopen(strcat(filename,"_clean"), "w");
-	char letter;
+	file_clean = fopen(clean, "w");
+	char letter = ' ';
+	char last = ' ';
 
 	if ( file_input && file_clean ) {
 		printf(" > Satanization du fichier ...\n");
 
 		do {
 
-			letter = fgetc(file_input);
+			last = letter;
+			letter = fgetc(file_input);			
 			
-			toLowerCase( &letter );
-			if ( letter < 'a' || letter > 'z') {
-				letter = ' ';
+			/* Clean */
+			if ( letter != EOF ) {
+				toLowerCase( &letter );
+				if ( letter < 'a' || letter > 'z') {
+					letter = ' ';
+				}
+				if ( letter == ' ' && last == ' ') {
+					fseek(file_clean, -1, SEEK_CUR);
+				}
+				/* Copy */
+				fputc(letter, file_clean);
 			}
-			fputc(letter, file_clean);
 
 		} while ( letter != EOF );
 
