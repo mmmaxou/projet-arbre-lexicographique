@@ -10,7 +10,7 @@
 #define SAUVEGARDE_ARBRE 4
 #define HELP 5
 #define SATANIZE 6
-#define TAILLE 500
+#define TAILLE 1000
 
 /* Couleurs */
 #define RED   "\x1B[31m"
@@ -301,6 +301,8 @@ void displayHelp() {
 	printf(": Sauvegarde du livre\n");
 	printf(MAGENTA "-S <filename>" RESET);
 	printf(": Sauvegarde de l'arbre\n");
+	printf(MAGENTA "-c <filename>" RESET);
+	printf(": Nettoie le fichier\n");
 	printf(MAGENTA "-h" RESET);
 	printf(": Affiche l'aide\n\n");
 }
@@ -313,9 +315,8 @@ void displayHelp() {
     La lettre à créer
 */
 Arbre allocTree(char c) {
-	Arbre a = (Arbre) malloc(sizeof(*a));
+	Arbre a = (Arbre) malloc(sizeof(Arbre));
 	if ( a ) {
-		toLowerCase(&c);
 		a->lettre = c;
 		a->filsg = NULL;
 		a->frered = NULL;
@@ -338,6 +339,15 @@ void toLowerCase( char *c ) {
 	}
 }
 
+void addBranch(Arbre *a, char *s) {
+	/* Ajout un mot dans une branche vide */
+	*a = allocTree(s[0]);
+	
+	if ( *a != NULL )
+		if ( s[0] != '\0' )
+			addBranch(&(*a)->filsg, &s[1]);
+}
+
 /*
   Function
   Ajoute un mot à l'arbre
@@ -353,53 +363,30 @@ void toLowerCase( char *c ) {
     -1: Erreur
     0: Ok
 */
-int addWord(Arbre *a, char s[]) {
-	char c;
-	Arbre tmp;
-	/*printf("Ajout de %s : ", s);*/
-
-	/* Création de l'arbre */
-	c = *s;
-	tmp = allocTree(c);
-	
-	if ( !tmp ) {
-		printf("Erreur allocation arbre\n");
-		return -1;
-	}
-
+void addWord(Arbre *a, char *s) {
 	/* Ajout de l'arbre crée dans l'arbre donné en arg */
-	if ( *a == NULL ) {
-		*a = tmp;
-		/*printf("%c added\n", (*a)->lettre);*/
-		if ( c == '\0' ) {
-			return 1;
-		} else {
-			return addWord(&((*a)->filsg), s+1 );
-		}
-	} else {
-
+	if ( *a == NULL )
+		addBranch(a, s);
+	
+	else {
 		/* On cherche parmis les freres */
-		if ( tmp->lettre > (*a)->lettre ) {
-			/* La lettre a ajouter est plus grande que le lettre de l'arbre */
-			return addWord(&((*a)->frered), s );
-		} else if ( tmp->lettre < (*a)->lettre ) {
-			/* La lettre a ajouter est plus petite que le lettre de l'arbre */
-			tmp->frered = *a;
-			*a = tmp;
-			if ( c != '\0' ) {
-				return addWord(&((*a)->filsg), s+1 );
-			} else  {
-				return 1;
-			}
-		} else {
+		/* La lettre a ajouter est plus grande que le lettre de l'arbre */
+		if ( s[0] > (*a)->lettre ) 
+			addWord(&((*a)->frered), s );
+		else {			
 			/* C'est la meme lettre */
-			free( tmp );
-			if ( c != '\0' ) {
-				return addWord(&((*a)->filsg), s+1 );
+			if ( s[0] == (*a)->lettre )  {
+				if ( s[0] != '\0' )
+					addWord(&((*a)->filsg), &s[1] );
+			} else {
+				/* La lettre a ajouter est plus petite que le lettre de l'arbre */
+				Arbre tmp = NULL;
+				addBranch(&tmp, s);
+				tmp->frered = *a;
+				*a = tmp;
 			}
 		}
 	}
-	return -1;
 }
 
 /* 
@@ -460,36 +447,6 @@ Arbre readDICO() {
 	}
 
 	return a;
-}
-
-
-/*
-  Fonction Utils
-  Supprime tous les caracteres qui posent problèmes lors de la lecture des mots
-
-  @param <char *word>
-*/
-void satanize(char *word) {
-	int id_read, id_write;
-	id_read = 0;
-	id_write = 0;
-	/*
-  printf("%s => ", word);
-  */
-	while (word[id_read] != '\0') {
-		toLowerCase( word + id_read );
-		if ( word[id_read] >= 'a' && word[id_read] <= 'z' ) {
-			word[id_write] = word[id_read];
-			id_write++;
-		} else {
-			word[id_read] = ' ';
-		}
-		id_read++;
-	}
-	word[id_write] = '\0';
-	/*
-  printf("%s\n", word);
-  */
 }
 
 /*
@@ -553,18 +510,18 @@ Arbre readFile() {
 	Arbre a = NULL;
 	FILE *file;
 	file = fopen(filename, "r");
-	char word[TAILLE] = "";
+	char word[TAILLE];
+	int cpt = 0;
+	int LAST = 36;
 
 	if ( file ) {
 		printf(" > Création de l'arbre ...\n");
 
-		while (fscanf(file, "%s", word) == 1) {
-
-			/* satanize */
-			satanize(word);
-			if ( word[0] != '\0' ) {
-				addWord(&a, word);
-			}
+		while (fscanf(file, "%1000s", word) == 1 && cpt <= LAST ) {
+			addWord(&a, word);
+			cpt++;
+			if ( cpt == LAST ) 
+				printf("%s\n", word);
 		}
 
 		printf(" > Arbre crée \n");

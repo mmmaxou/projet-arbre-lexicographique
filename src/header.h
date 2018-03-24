@@ -31,7 +31,8 @@ void satanizeFile();
 Arbre allocTree(char c);
 void getStrippedFilename(char s[]);
 void getFilenameExtension( char s[], char ext[] );
-int addWord(Arbre *a, char s[]);
+void addBranch(Arbre *a, char *s);
+void addWord(Arbre *a, char *s);
 void toLowerCase( char *c );
 
 /* FONCTIONS D'EXECUTIONS */
