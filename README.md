@@ -31,10 +31,15 @@ Liste des options :
  
 # TODO
 
+* Sauvegarder l'arbre dans un fichier, le nom du fichier de sauvegarde est le nom d'entrée suivi du suffixe (.DICO)
+
+
+
+# DONE
+
 * Afficher les mots du lexique en ordre lexicographique
 * Sauvegarder les mots du lexique en ordre alphabétique. Le nom du fichier de sauvegarde est le nom du fichier d'entrée suivi du suffixe ( .L )
 * Indiquer si le mot est present dans le texte sous forme __*present*__ ou __*absent*__
-* Sauvegarder l'arbre dans un fichier, le nom du fichier de sauvegarde est le nom d'entrée suivi du suffixe (.DICO)
 * Menu des commandes :
   * -> Affichage
   * -> Sauvegarde des mots du lexique (.L)
@@ -46,6 +51,3 @@ Liste des options :
   * -> Recherche
   * -> Sauvegarde de l'arbre (.DICO)
 
-# DONE
-
-...

@@ -63,6 +63,11 @@ int main(int argc, char *argv[]) {
 	printf("Sylvie ? %d\n", research(tree, "Sylvie"));
 	printf("sylvie ? %d\n", research(tree, "sylvie"));
 	*/
+  FILE *file;
+  file = fopen("tree.dot", "w+");
+  dot_export( tree, file );
+  fclose(file);
+  free_arbre( tree );
 	
   return 0;
 }
@@ -165,9 +170,11 @@ void executeCommand( int command, Arbre a ) {
       break;
     case SAUVEGARDE_MOTS:
       /* Fonction de SAUVEGARDE_MOTS */
+      saveWords( a );
       break;
     case SAUVEGARDE_ARBRE:
       /* Fonction de SAUVEGARDE_ARBRE */
+      saveTree( a );
       break;
     case HELP:
       /* Fonction de HELP */
@@ -359,15 +366,18 @@ int addWord(Arbre *a, char s[]) {
       /* La lettre a ajouter est plus petite que le lettre de l'arbre */
       tmp->frered = *a;
       *a = tmp;
-      return addWord(&((*a)->filsg), s+1 );
+      if ( c != '\0' ) {
+        return addWord(&((*a)->filsg), s+1 );
+      } else  {
+        return 1;
+      }
     } else {
       /* C'est la meme lettre */
-      return addWord(&((*a)->filsg), s+1 );
+      if ( c != '\0' ) {
+        return addWord(&((*a)->filsg), s+1 );
+      } 
     }
-
-
   }
-
   return -1;
 }
 
@@ -413,7 +423,6 @@ Arbre readFile() {
   @param <int i>
 */
 void displayTree_rec( Arbre a, UListe *path ) {
-   
   if ( a ) {
     ajouterFinUListe( path, a->lettre );
     if( a->lettre == '\0' ) {
@@ -422,10 +431,8 @@ void displayTree_rec( Arbre a, UListe *path ) {
     displayTree_rec( a->filsg, path );
     supprimerDernierUListe( path );
     displayTree_rec( a->frered, path );
-    
   }
 }
-
 
 /*
   Fonction
@@ -434,8 +441,7 @@ void displayTree_rec( Arbre a, UListe *path ) {
   @param <Arbre a>
 */
 void displayTree( Arbre a ) {
-  if ( a == NULL ) return;
-  
+  if ( a == NULL ) return;  
   UListe path;
   path.premier = NULL;
   path.dernier = NULL;
@@ -450,8 +456,29 @@ void displayTree( Arbre a ) {
   @param <Arbre a>
   @param <FILE file>
 */
-void saveWords_rec (Arbre a, FILE file) {
-  /* TODO */
+void saveWords_rec (Arbre a, FILE *file, UListe *path) {
+  if ( a ) {
+    ajouterFinUListe( path, a->lettre );
+    
+    /* Sauvegarde */
+    if( a->lettre == '\0' ) {
+      Mot actuel = path->premier;
+      while ( actuel != NULL ) {
+        if ( actuel->lettre == '\0') {
+          fputc(' ', file);
+        } else {
+          fputc(actuel->lettre, file );
+        }
+        actuel = actuel->suiv;
+      }
+      fputc('\n', file);
+    }
+    /* Fin Sauvegarde */
+    
+    saveWords_rec( a->filsg, file, path );
+    supprimerDernierUListe( path );
+    saveWords_rec( a->frered, file, path );
+  }
 }
 
 /*
@@ -461,19 +488,28 @@ void saveWords_rec (Arbre a, FILE file) {
   @param <Arbre a>
 */
 void saveWords( Arbre a ) {
-  FILE file;
+  if ( a == NULL ) return;
+  
+  /* Fichier */
+  FILE *file;
   char fileWords[255];
   getFilenameExtension( fileWords, ".L");
   printf("%s\n", fileWords);
+
+  /* Liste chainée */
+  UListe path;
+  path.premier = NULL;
+  path.dernier = NULL;
+  path.taille = 0;
+  
   /* Creation du fichier */
-  /* TODO */
+  file = fopen(fileWords, "w+");
 
   /* Sauvegarde de l'arbre */
-  /* TODO */
-  saveWords_rec( a, file );
+  saveWords_rec( a, file, &path );
 
   /* Fermeture du fichier */
-  /* TODO */
+  fclose(file);
 }
 
 
@@ -495,18 +531,90 @@ int research( Arbre a, char* mot ) {
   return research(a->frered, mot);
 }
 
+
+/*
+  Fonction recursive
+  Sauvegarde un noeud de l'arbre
+
+  @param <Arbre a>
+  @param <FILE file>
+*/
+void saveTree_rec (Arbre a, FILE *file) {
+  if ( a ) {
+    
+    /* Sauvegarde */
+    if( a->lettre == '\0' ) {
+      fputc(' ', file);
+    } else {
+      fputc(a->lettre, file);      
+    }
+    /* Fin Sauvegarde */
+    
+    if ( a->lettre != '\0') {
+      saveTree_rec( a->filsg, file );
+    }
+    saveTree_rec( a->frered, file );
+  } else {
+      fputc('\'', file);    
+      fputc('\\', file);    
+      fputc('n', file);    
+      fputc('\'', file);    
+  }
+}
+
 /*
   Fonction
   Sauvegarder l'arbre dans un fichier, le nom du fichier de sauvegarde est le nom d'entrée suivi du suffixe (.DICO)
 
   @param <Arbre a>
 */
-  /*
 void saveTree( Arbre a ) {
-  FILE file;
-  char fileTree[255];
-  getFilenameExtension( fileTree, ".DICO");
-  printf("%s\n", fileTree);
+  if ( a == NULL ) return;
+  
+  /* Fichier */
+  FILE *file;
+  char fileWords[255];
+  getFilenameExtension( fileWords, ".DICO");
+  printf("%s\n", fileWords);
+
+  /* Creation du fichier */
+  file = fopen(fileWords, "w+");
+
+  /* Sauvegarde de l'arbre */
+  saveTree_rec( a, file );
+
+  /* Fermeture du fichier */
+  fclose(file);
 }
 
-*/
+int rec_dot_export(Arbre a, int nodeID, FILE *dot_file) {
+  char val, res_fg=0, res_fd=0;
+  if (a != NULL) {
+    val = a->lettre;
+    if ( val == '\0' ) val = '0';
+    fprintf(dot_file, "\tn%d [label=\"<fils> | <lettre> %c | <frere>\"];\n", nodeID, val);
+  }
+  if (a->frered != NULL) {
+    fprintf(dot_file, "\tn%d:fils:c -> n%d:lettre;\n", nodeID, nodeID+1);
+    res_fg = rec_dot_export(a->frered, nodeID+1, dot_file);
+  }
+  if (a->filsg != NULL) {
+    fprintf(dot_file, "\tn%d:frere:c -> n%d:lettre;\n", nodeID, nodeID+res_fg+1);
+    res_fd = rec_dot_export(a->filsg, nodeID+res_fg+1, dot_file);
+  }
+  return res_fg+res_fd+1;
+}
+void dot_export(Arbre a, FILE *dot_file) {
+  fprintf(dot_file, "digraph arbre {\n");
+  fprintf(dot_file, "\tnode [shape=record,height=.1]\n");
+  fprintf(dot_file, "\tedge [tailclip=false,arrowtail=dot,dir=both]\n");
+  rec_dot_export(a, 0, dot_file);
+  fprintf(dot_file, "}\n");
+}
+void free_arbre(Arbre a) {
+  if (a != NULL) {
+    free_arbre(a->frered);
+    free_arbre(a->filsg);
+    free(a);
+  }
+}
