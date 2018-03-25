@@ -25,17 +25,18 @@ Liste des options :
  * `-r <mot> <filename>` : Recherche du mot dans le livre
  * `-s <filename>` : Sauvegarde du livre
  * `-S <filename>` : Sauvegarde de l'arbre
+ * `-c <filename>` : Nettoie le fichier des caracteres speciaux
  * `-h` : Affiche l'aide
  
  
  
 # TODO
 
-* Reconstruire a partir du fichier .DICO
-* Rapport
 
 # DONE
 
+* Reconstruire a partir du fichier .DICO
+* Rapport
 * Sauvegarder l'arbre dans un fichier, le nom du fichier de sauvegarde est le nom d'entrée suivi du suffixe (.DICO)
 * Afficher les mots du lexique en ordre lexicographique
 * Sauvegarder les mots du lexique en ordre alphabétique. Le nom du fichier de sauvegarde est le nom du fichier d'entrée suivi du suffixe ( .L )

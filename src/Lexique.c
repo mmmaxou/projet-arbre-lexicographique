@@ -1,3 +1,11 @@
+/*
+Author
+
+Maximilien Pluchard
+Nathanaël Rovere
+*/
+
+
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -30,9 +38,7 @@ static char *researchedWord;
 int main(int argc, char *argv[]) {
 	Arbre tree = NULL;
 	int command;
-	/*
   int userInput = 1;
-*/
 	/* On vérifie que l'argument donné en ligne de commande est correct et on ouvre le fichier */
 	command = parseCommand(argc, argv);
 	if ( command > 0 ) {
@@ -59,12 +65,10 @@ int main(int argc, char *argv[]) {
 	executeCommand( command, tree );
 
 	/* On affiche le menu des commandes */
-	/*
   while ( userInput != 0 ) {
     userInput = promptUser();
     executeCommand( userInput, tree );
   }
-  */
 
 	FILE *file;
 	file = fopen("tree.dot", "w+");
@@ -215,6 +219,7 @@ void executeCommand( int command, Arbre a ) {
     3: SAUVEGARDE_MOTS
     4: SAUVEGARDE_ARBRE
 		5: HELP
+		6: SATANIZE
 */
 int promptUser() {
 	int u, i;
@@ -226,7 +231,8 @@ int promptUser() {
 	printf(" > %d: RECHERCHE\n", RECHERCHE);
 	printf(" > %d: SAUVEGARDE_MOTS\n", SAUVEGARDE_MOTS);
 	printf(" > %d: SAUVEGARDE_ARBRE\n", SAUVEGARDE_ARBRE);
-	printf(" > %d: HELP\n" RESET, HELP);
+	printf(" > %d: HELP\n", HELP);
+	printf(" > %d: CLEAN\n" RESET, SATANIZE);
 	scanf("%d", &u);
 
 	if ( u == RECHERCHE ) {
@@ -241,7 +247,7 @@ int promptUser() {
 		}
 	}
 
-	if ( u < 0 || u > HELP ) {
+	if ( u < 0 || u > SATANIZE ) {
 		printf("Invalid input given.\n");
 		return promptUser();
 	}
